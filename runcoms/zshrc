@@ -15,10 +15,19 @@ fi
 #source custom aliases
 source "${ZDOTDIR:-$HOME}/.bash_aliases"
 
+export DEBEMAIL='antoine.desbordes@gmail.com'
+export DEBFULLNAME='Antoine Desbordes'
 
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/devel
 source /usr/local/bin/virtualenvwrapper.sh
+export PATH=$PATH:/home/antoine/.cargo/bin
+
+export RUST_SRC_PATH=$HOME/.multirust/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src
 
 #for a keke's prompt
 TERM=xterm-256color
+
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+  source /etc/profile.d/vte.sh
+fi

@@ -55,6 +55,11 @@ function prompt_paradox_build_prompt {
   prompt_paradox_end_segment
 }
 
+function prompt_venv {
+  prompt_paradox_start_segment yellow black '%v'
+  prompt_paradox_end_segment
+}
+
 function prompt_paradox_pwd {
   local pwd="${PWD/#$HOME/~}"
 
@@ -62,7 +67,9 @@ function prompt_paradox_pwd {
     _prompt_paradox_pwd="$MATCH"
     unset MATCH
   else
-    _prompt_paradox_pwd="${${${${(@j:/:M)${(@s:/:)pwd}##.#?}:h}%/}//\%/%%}/${${pwd:t}//\%/%%}"
+    #_prompt_paradox_pwd="${${${${(@j:/:M)${(@s:/:)pwd}##.#?}:h}%/}//\%/%%}/${${pwd:t}//\%/%%}"
+    # I prefer the full path
+    _prompt_paradox_pwd="$pwd"
   fi
 }
 
@@ -101,8 +108,12 @@ function prompt_paradox_precmd {
   prompt_paradox_print_elapsed_time
 }
 
+_prompt_paradox_start_time="$SECONDS"
 function prompt_paradox_preexec {
   _prompt_paradox_start_time="$SECONDS"
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
 }
 
 function prompt_paradox_setup {
@@ -143,11 +154,17 @@ function prompt_paradox_setup {
     'ref' '$(coalesce "%b" "%p" "%c")' \
     'status' '%s%D%A%B%S%a%d%m%r%U%u'
 
+  #zstyle ':prezto:module:python:info:virtualenv' format 'virtualenv:%v'
+  venv_formated=${(e)$(prompt_venv)}
+  zstyle ':prezto:module:python:info:virtualenv' format $venv_formated
+  #zstyle ':prezto:module:python:info:virtualenv' format '%F{yellow}[%v]%f '
+
   # Define prompts.
   PROMPT='
 ${(e)$(prompt_paradox_build_prompt)}
  ${editor_info[keymap]} '
-  RPROMPT='%F{blue}[%F{green}%D{%H:%M:%S}%F{blue}]%f'
+  #RPROMPT='%F{blue}[%F{green}%D{%H:%M:%S}%F{blue}]%f'
+  RPROMPT='$python_info[virtualenv]%F{blue}[%F{green}%D{%D %H:%M:%S}%F{blue}]%f'
   SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 }
 
